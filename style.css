@@ -1,0 +1,80 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+    background: #88a16a;
+    color: white;
+}
+  
+#game {
+    display: grid;
+    gap: 2px;
+    justify-content: center;
+    margin-top: 20px;
+}
+  
+.cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #bcbcbc;
+    border: 1px solid #dcdcdc;
+    font-size: 32px;
+    color: black;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.1s ease, transform 0.1s ease;
+}
+
+.cell:not(.revealed):hover {
+    background-color: #e0e0e0;
+    transform: scale(1.05);
+}
+
+.cell:has(.flag):hover {
+    transform: none;
+}
+  
+.cell.revealed {
+    background: #a6a6a6;
+    cursor: default;
+}
+
+.cell[data-number="1"] { color: #009cfd; }
+.cell[data-number="2"] { color: #75cca9; }
+.cell[data-number="3"] { color: #fd5e58; }
+.cell[data-number="4"] { color: #314462; }
+.cell[data-number="5"] { color: #a5181e; }
+
+.flag {
+    display: inline-block;
+    animation: stamp-in 0.1s ease-out;
+    font-size: 1em;
+}
+  
+@keyframes stamp-in {
+    0% {
+        transform: scale(2);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.fade-out {
+    animation: fade-away 0.2s ease-out forwards;
+}
+  
+@keyframes fade-away {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
