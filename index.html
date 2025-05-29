@@ -6,14 +6,22 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div>
-        <div id="timer">⏱️ <span id="time-elapsed">0</span>s</div>
-        <div id="flags-left">🚩 <span id="flag-count">10</span></div>
+    <div class="control-panel">
+        <div class="control" id="timer">⏱️ <span id="time-elapsed">0</span>s</div>
+        <div class="control" id="flags-left">🚩 <span id="flag-count">10</span></div>
     </div>
     
     <div id="game"></div>
 
-    <button onclick="startGame()">Restart</button>
+    <div class="control-panel">
+        <select id="difficulty-select" class="control">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+
+        <button class="control" onclick="startGame()">Restart</button>
+    </div>
 
     <script src="script.js"></script>
 </body>

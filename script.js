@@ -1,34 +1,51 @@
 const game = document.getElementById('game');
-const width = 10;
-const height = 10;
-const mineCount = 10;
+const difficultySelect = document.getElementById('difficulty-select');
 
+const DIFFICULTY_SETTINGS = {
+    easy: { rows: 9, cols: 9, mines: 10 },
+    medium: { rows: 16, cols: 16, mines: 40 },
+    hard: { rows: 16, cols: 32, mines: 99 }
+};
+
+let currentDifficulty = 'medium';
 let cells = [];
 let flagCount = 0;
-
 let seconds = 0;
 let timerInterval = null;
 let gameStarted = false;
 
+let rows, cols, mineCount;
+
+difficultySelect.addEventListener('change', () => {
+    currentDifficulty = difficultySelect.value;
+    startGame();
+});
+
 function startGame() {
     stopTimer();
-    document.getElementById('time-elapsed').textContent = '0';
+    seconds = 0;
+    gameStarted = false;
 
+    const settings = DIFFICULTY_SETTINGS[currentDifficulty];
+    rows = settings.rows;
+    cols = settings.cols;
+    mineCount = settings.mines;
+
+    document.getElementById('time-elapsed').textContent = '0';
     flagCount = 0;
-    document.getElementById('flag-count').textContent = flagCount;
+    document.getElementById('flag-count').textContent = mineCount;
 
     game.innerHTML = '';
-
     cells = [];
 
-    createBoard(width, height, mineCount);
+    createBoard();
 }
 
 function createBoard() {
-    game.style.gridTemplateColumns = `repeat(${width}, 40px)`;
-    game.style.gridTemplateRows = `repeat(${height}, 40px)`;
+    game.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
+    game.style.gridTemplateRows = `repeat(${rows}, 40px)`;
 
-    for (let i = 0; i < width * height; i++) {
+    for (let i = 0; i < rows * cols; i++) {
         const cell = document.createElement('div');
         cell.classList.add('cell');
         cell.dataset.index = i;
@@ -36,7 +53,6 @@ function createBoard() {
         cells.push(cell);
 
         cell.addEventListener('click', () => revealCell(i));
-
         cell.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             toggleFlag(i);
@@ -45,7 +61,7 @@ function createBoard() {
 
     let mineIndices = new Set();
     while (mineIndices.size < mineCount) {
-        mineIndices.add(Math.floor(Math.random() * width * height));
+        mineIndices.add(Math.floor(Math.random() * rows * cols));
     }
 
     cells.forEach((cell, i) => {
@@ -89,21 +105,21 @@ function clearBoard() {
 
 function getNeighbors(index) {
     const neighbors = [];
-    const x = index % width;
-    const y = Math.floor(index / width);
+    const x = index % cols;
+    const y = Math.floor(index / cols);
 
     for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
             if (dx === 0 && dy === 0) continue;
             const nx = x + dx;
             const ny = y + dy;
-            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                neighbors.push(ny * width + nx);
+            if (nx >= 0 && nx < cols && ny >= 0 && ny < rows) {
+                neighbors.push(ny * cols + nx);
             }
         }
     }
 
-  return neighbors;
+    return neighbors;
 }
 
 function revealCell(index) {
@@ -119,9 +135,9 @@ function revealCell(index) {
 
     if (cell.dataset.mine === 'true') {
         stopTimer();
-        cell.textContent = '💣';
+        cell.textContent = '💥';
         alert('Game Over!');
-        revealAll();
+        revealAll(index);
     } else {
         const count = parseInt(cell.dataset.adjacent);
         if (count > 0) {
@@ -135,10 +151,14 @@ function revealCell(index) {
     }
 }
 
-function revealAll() {
-    cells.forEach(cell => {
+function revealAll(explodedIndex = null) {
+    cells.forEach((cell, i) => {
         if (cell.dataset.mine === 'true') {
-            cell.textContent = '💣';
+            if (i === explodedIndex) {
+                cell.textContent = '💥'; // Exploded bomb
+            } else {
+                cell.textContent = '💣'; // Normal bomb
+            }
         }
         cell.classList.add('revealed');
     });
